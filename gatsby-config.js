@@ -10,7 +10,7 @@ module.exports = {
         fieldName: "hasura",
         createLink: () => {
           return createHttpLink({
-            uri: process.env.GATSBY_HASURA_GRAPHQL_URL,
+            uri: "https://ew-gql.herokuapp.com/v1/graphql",
             headers: {},
             fetch
           });
