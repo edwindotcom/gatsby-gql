@@ -1,11 +1,11 @@
 {
-  "name": "gatsby-postgres-graphql",
+  "name": "gatsby-gql",
   "description": "Gatsby simple source hasura graphql cms",
   "license": "MIT",
   "scripts": {
-    "develop": "gatsby develop",
-    "build": "gatsby build",
-    "serve": "gatsby serve"
+    "develop": "gatsby develop --prefix-paths",
+    "build": "gatsby build --prefix-paths",
+    "serve": "gatsby serve --prefix-paths"
   },
   "dependencies": {
     "@hot-loader/react-dom": "^16.8.6",

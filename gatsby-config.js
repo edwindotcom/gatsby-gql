@@ -2,6 +2,7 @@ const fetch = require(`node-fetch`);
 const { createHttpLink } = require(`apollo-link-http`);
 
 module.exports = {
+  pathPrefix: "/gatsby-gql",
   plugins: [
     {
       resolve: "gatsby-source-graphql",
