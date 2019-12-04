@@ -1,97 +1,218 @@
-<!-- AUTO-GENERATED-CONTENT:START (STARTER) -->
-<p align="center">
-  <a href="https://www.gatsbyjs.org">
-    <img alt="Gatsby" src="https://www.gatsbyjs.org/monogram.svg" width="60" />
-  </a>
-</p>
-<h1 align="center">
-  Gatsby's hello-world starter
-</h1>
+# gatsby-postgres-graphql
 
-Kick off your project with this hello-world boilerplate. This starter ships with the main Gatsby configuration files you might need to get up and running blazing fast with the blazing fast app generator for React.
+Boilerplate to get started with Gatsby, Hasura GraphQL engine as CMS and postgres as database using the awesome plugin [gatsby-source-graphql](https://github.com/gatsbyjs/gatsby/tree/master/packages/gatsby-source-graphql).
 
-_Have another more specific idea? You may want to check out our vibrant collection of [official and community-created starters](https://www.gatsbyjs.org/docs/gatsby-starters/)._
+[![Edit gatsby-postgres-graphql](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/github/hasura/graphql-engine/tree/master/community/sample-apps/gatsby-postgres-graphql?fontsize=14)
 
-## 🚀 Quick start
+![Gatsby Postgres GraphQL](./assets/gatsby-postgres-graphql.png)
 
-1.  **Create a Gatsby site.**
+# Tutorial
 
-    Use the Gatsby CLI to create a new site, specifying the hello-world starter.
+1. Deploy Postgres and GraphQL Engine on Heroku:
 
-    ```shell
-    # create a new Gatsby site using the hello-world starter
-    gatsby new my-hello-world-starter https://github.com/gatsbyjs/gatsby-starter-hello-world
-    ```
+[![Deploy to
+heroku](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/hasura/graphql-engine-heroku)
 
-1.  **Start developing.**
+2. Get the Heroku app URL (say `my-app.herokuapp.com`)
+3. Clone this repo:
 
-    Navigate into your new site’s directory and start it up.
+```bash
+git clone https://github.com/hasura/graphql-engine
+cd graphql-engine/community/sample-apps/gatsby-postgres-graphql
+```
 
-    ```shell
-    cd my-hello-world-starter/
-    gatsby develop
-    ```
+4. Create `author` table:
 
-1.  **Open the source code and start editing!**
+Open Hasura console: visit https://my-app.herokuapp.com on a browser  
+ Navigate to `Data` section in the top nav bar and create a table as follows:
 
-    Your site is now running at `http://localhost:8000`!
+![Create author table](./assets/add_table.jpg)
 
-    _Note: You'll also see a second link: _`http://localhost:8000/___graphql`_. This is a tool you can use to experiment with querying your data. Learn more about using this tool in the [Gatsby tutorial](https://www.gatsbyjs.org/tutorial/part-five/#introducing-graphiql)._
+5. Insert sample data into `author` table:
 
-    Open the `my-hello-world-starter` directory in your code editor of choice and edit `src/pages/index.js`. Save your changes and the browser will update in real time!
+![Insert data into author table](./assets/insert_data.jpg)
 
-## 🧐 What's inside?
+Verify if the row is inserted successfully
 
-A quick look at the top-level files and directories you'll see in a Gatsby project.
+![Insert data into author table](./assets/browse_rows.jpg)
 
-    .
-    ├── node_modules
-    ├── src
-    ├── .gitignore
-    ├── .prettierrc
-    ├── gatsby-browser.js
-    ├── gatsby-config.js
-    ├── gatsby-node.js
-    ├── gatsby-ssr.js
-    ├── LICENSE
-    ├── package-lock.json
-    ├── package.json
-    └── README.md
+6. Install npm modules:
 
-1.  **`/node_modules`**: This directory contains all of the modules of code that your project depends on (npm packages) are automatically installed.
+```bash
+npm install
+```
 
-2.  **`/src`**: This directory will contain all of the code related to what you will see on the front-end of your site (what you see in the browser) such as your site header or a page template. `src` is a convention for “source code”.
+7. Configure gatsby to use `gatsby-source-graphql` plugin and a connection GraphQL url to stitch the schema.
 
-3.  **`.gitignore`**: This file tells git which files it should not track / not maintain a version history for.
+```js
+{
+  plugins: [
+    {
+      resolve: "gatsby-source-graphql", // <- Configure plugin
+      options: {
+        typeName: "HASURA",
+        fieldName: "hasura", // <- fieldName under which schema will be stitched
+        createLink: () =>
+          createHttpLink({
+            uri: `${process.env.GATSBY_HASURA_GRAPHQL_URL}`, // <- Configure connection GraphQL url
+            headers: {},
+            fetch
+          }),
+        refetchInterval: 10 // Refresh every 10 seconds for new data
+      }
+    }
+  ];
+}
+```
 
-4.  **`.prettierrc`**: This is a configuration file for [Prettier](https://prettier.io/). Prettier is a tool to help keep the formatting of your code consistent.
+8. Run the app:
 
-5.  **`gatsby-browser.js`**: This file is where Gatsby expects to find any usage of the [Gatsby browser APIs](https://www.gatsbyjs.org/docs/browser-apis/) (if any). These allow customization/extension of default Gatsby settings affecting the browser.
+```bash
+GATSBY_HASURA_GRAPHQL_URL=https://my-app.herokuapp.com/v1/graphql npm run develop
+```
 
-6.  **`gatsby-config.js`**: This is the main configuration file for a Gatsby site. This is where you can specify information about your site (metadata) like the site title and description, which Gatsby plugins you’d like to include, etc. (Check out the [config docs](https://www.gatsbyjs.org/docs/gatsby-config/) for more detail).
+9. Test the app
+   Visit [http://localhost:8000](http://localhost:8000) to view the app
 
-7.  **`gatsby-node.js`**: This file is where Gatsby expects to find any usage of the [Gatsby Node APIs](https://www.gatsbyjs.org/docs/node-apis/) (if any). These allow customization/extension of default Gatsby settings affecting pieces of the site build process.
+![Demo app](./assets/test_app.jpg)
 
-8.  **`gatsby-ssr.js`**: This file is where Gatsby expects to find any usage of the [Gatsby server-side rendering APIs](https://www.gatsbyjs.org/docs/ssr-apis/) (if any). These allow customization of default Gatsby settings affecting server-side rendering.
+# Make a GraphQL query from your component using hooks
 
-9.  **`LICENSE`**: Gatsby is licensed under the MIT license.
+1. Create a component named `AuthorList.js`:
 
-10. **`package-lock.json`** (See `package.json` below, first). This is an automatically generated file based on the exact versions of your npm dependencies that were installed for your project. **(You won’t change this file directly).**
+```js
+import React from "react";
+import { useQuery } from "@apollo/react-hooks";
+import { gql } from "apollo-boost";
 
-11. **`package.json`**: A manifest file for Node.js projects, which includes things like metadata (the project’s name, author, etc). This manifest is how npm knows which packages to install for your project.
+const GET_AUTHORS = gql`
+  query {
+    author {
+      id
+      name
+    }
+  }
+`;
 
-12. **`README.md`**: A text file containing useful reference information about your project.
+const AuthorList = () => {
+  const { loading, error, data } = useQuery(GET_AUTHORS);
 
-## 🎓 Learning Gatsby
+  if (loading) return "loading...";
+  if (error) return `error: ${error.message}`;
 
-Looking for more guidance? Full documentation for Gatsby lives [on the website](https://www.gatsbyjs.org/). Here are some places to start:
+  return (
+    <div>
+      {data.author.map((author, index) => (
+        <div key={index}>
+          <h2>{author.name}</h2>
+        </div>
+      ))}
+    </div>
+  );
+};
 
-- **For most developers, we recommend starting with our [in-depth tutorial for creating a site with Gatsby](https://www.gatsbyjs.org/tutorial/).** It starts with zero assumptions about your level of ability and walks through every step of the process.
+export default AuthorList;
+export { GET_AUTHORS };
+```
 
-- **To dive straight into code samples, head [to our documentation](https://www.gatsbyjs.org/docs/).** In particular, check out the _Guides_, _API Reference_, and _Advanced Tutorials_ sections in the sidebar.
+# Make a GraphQL mutation using hooks
 
-## 💫 Deploy
+Additional packages are needed to be added to support mutations: <br/>
+`npm install @apollo/react-hooks apollo-boost isomorphic-fetch`
 
-[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/gatsbyjs/gatsby-starter-hello-world)
+1. Create an `apollo.js` util file:
 
-<!-- AUTO-GENERATED-CONTENT:END -->
+```js
+import ApolloClient from "apollo-boost";
+import fetch from "isomorphic-fetch";
+
+export const client = new ApolloClient({
+  uri: process.env.GATSBY_HASURA_GRAPHQL_URL,
+  fetch
+});
+```
+
+2. Create `gatsby-browser.js` and `gatsby-ssr.js`
+
+```js
+import React from "react";
+import { ApolloProvider } from "@apollo/react-hooks";
+import { client } from "./src/utils/apollo";
+
+export const wrapRootElement = ({ element }) => (
+  <ApolloProvider client={client}>{element}</ApolloProvider>
+);
+```
+
+3. Create an `AddAuthor.js` component to add mutations:
+
+```js
+import React, { useState } from "react";
+import { useMutation } from "@apollo/react-hooks";
+import { gql } from "apollo-boost";
+import { GET_AUTHORS } from "./AuthorList";
+
+const ADD_AUTHOR = gql`
+  mutation insert_author($name: String!) {
+    insert_author(objects: { name: $name }) {
+      returning {
+        id
+        name
+      }
+    }
+  }
+`;
+
+const AddAuthor = () => {
+  const [author, setAuthor] = useState("");
+  const [insert_author, { loading, error }] = useMutation(ADD_AUTHOR, {
+    update: (cache, { data }) => {
+      setAuthor("");
+      const existingAuthors = cache.readQuery({
+        query: GET_AUTHORS
+      });
+
+      // Add the new author to the cache
+      const newAuthor = data.insert_author.returning[0];
+      cache.writeQuery({
+        query: GET_AUTHORS,
+        data: {author: [newAuthor, ...existingAuthors.author]}
+      });
+    }
+  });
+
+  if (loading) return "loading...";
+  if (error) return `error: ${error.message}`;
+
+  const handleSubmit = event => {
+    event.preventDefault();
+    insert_author({
+      variables: {
+        name: author
+      }
+    });
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <label htmlFor="author">
+        Add Author:
+        <input
+          name="author"
+          value={author}
+          onChange={event => setAuthor(event.target.value)}
+        />
+      </label>
+      <button type="submit">ADD</button>
+    </form>
+  );
+};
+
+export default AddAuthor;
+```
+
+4. Run the app and test mutation. New data will be added to the top via a cache update.
+
+# Contributing
+
+Checkout the [contributing guide](../../../CONTRIBUTING.md#community-content) for more details.

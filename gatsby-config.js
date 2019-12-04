@@ -1,9 +1,22 @@
-/**
- * Configure your Gatsby site with this file.
- *
- * See: https://www.gatsbyjs.org/docs/gatsby-config/
- */
+const fetch = require(`node-fetch`);
+const { createHttpLink } = require(`apollo-link-http`);
 
 module.exports = {
-  /* Your site config here */
-}
+  plugins: [
+    {
+      resolve: "gatsby-source-graphql",
+      options: {
+        typeName: "HASURA",
+        fieldName: "hasura",
+        createLink: () => {
+          return createHttpLink({
+            uri: process.env.GATSBY_HASURA_GRAPHQL_URL,
+            headers: {},
+            fetch
+          });
+        },
+        refetchInterval: 10 // Refresh every 60 seconds for new data
+      }
+    }
+  ]
+};
