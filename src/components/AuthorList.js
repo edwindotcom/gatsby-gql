@@ -1,6 +1,7 @@
 import React from "react";
 import { useQuery } from "@apollo/react-hooks";
 import { gql } from "apollo-boost";
+import { Text } from "evergreen-ui"
 
 const GET_AUTHORS = gql`
   query {
@@ -19,12 +20,15 @@ const AuthorList = () => {
 
   return (
     <div>
-      {data.author.map((author, index) => (
-        <div key={index}>
-          <h2>{author.name}</h2>
-        </div>
-      ))}
+      <Text>
+        {data.author.map((author, index) => (
+          <div key={index}>
+            <h2>{author.name}</h2>
+          </div>
+        ))}
+      </Text>
     </div>
+
   );
 };
 
