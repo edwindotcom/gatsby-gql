@@ -1,7 +1,8 @@
-import React, { useState } from "react";
-import { useMutation } from "@apollo/react-hooks";
-import { gql } from "apollo-boost";
-import { GET_AUTHORS } from "./AuthorList";
+import React, { useState } from "react"
+import { useMutation } from "@apollo/react-hooks"
+import { gql } from "apollo-boost"
+import { GET_AUTHORS } from "./AuthorList"
+import { Button, TextInputField } from "evergreen-ui"
 
 const ADD_AUTHOR = gql`
   mutation insert_author($name: String!) {
@@ -12,51 +13,52 @@ const ADD_AUTHOR = gql`
       }
     }
   }
-`;
+`
 
 const AddAuthor = () => {
-  const [author, setAuthor] = useState("");
+  const [author, setAuthor] = useState("")
   const [insert_author, { loading, error }] = useMutation(ADD_AUTHOR, {
     update: (cache, { data }) => {
-      setAuthor("");
+      setAuthor("")
       const existingAuthors = cache.readQuery({
-        query: GET_AUTHORS
-      });
+        query: GET_AUTHORS,
+      })
 
       // Add the new author to the cache
-      const newAuthor = data.insert_author.returning[0];
+      const newAuthor = data.insert_author.returning[0]
       cache.writeQuery({
         query: GET_AUTHORS,
-        data: {author: [newAuthor, ...existingAuthors.author]}
-      });
-    }
-  });
+        data: { author: [newAuthor, ...existingAuthors.author] },
+      })
+    },
+  })
 
-  if (loading) return "loading...";
-  if (error) return `error: ${error.message}`;
+  if (loading) return "loading..."
+  if (error) return `error: ${error.message}`
 
   const handleSubmit = event => {
-    event.preventDefault();
+    event.preventDefault()
     insert_author({
       variables: {
-        name: author
-      }
-    });
-  };
+        name: author,
+      },
+    })
+  }
 
   return (
-    <form onSubmit={handleSubmit}>
-      <label htmlFor="author">
-        Add Author:
-        <input
-          name="author"
-          value={author}
-          onChange={event => setAuthor(event.target.value)}
-        />
-      </label>
-      <button type="submit">ADD</button>
-    </form>
-  );
-};
+    // <Text>
+      <form onSubmit={handleSubmit}>
+          <TextInputField
+            name="author"
+            label="Add ToDo Item"
+            inputWidth="300px"
+            value={author}
+            onChange={event => setAuthor(event.target.value)}
+          />
+        <Button type="submit">Save</Button>
+      </form>
+    // </Text>
+  )
+}
 
-export default AddAuthor;
+export default AddAuthor

@@ -5,13 +5,14 @@
   "scripts": {
     "develop": "gatsby develop --prefix-paths",
     "build": "gatsby build --prefix-paths",
-    "serve": "gatsby serve --prefix-paths"
+    "serve": "gatsby build --prefix-paths && gatsby serve --prefix-paths"
   },
   "dependencies": {
-    "@hot-loader/react-dom": "^16.8.6",
     "@apollo/react-hooks": "^3.1.1",
+    "@hot-loader/react-dom": "^16.8.6",
     "apollo-boost": "^0.4.4",
     "apollo-link-http": "^1.5.5",
+    "evergreen-ui": "^4.21.5",
     "gatsby": "^2.0.9",
     "gatsby-link": "^2.0.2",
     "gatsby-source-graphql": "^2.0.2",
